@@ -1,5 +1,7 @@
 # scRNA-seq-reproducible
 
+[![CI](https://github.com/arjunbioinfo/scRNA-seq-reproducible/actions/workflows/ci.yml/badge.svg)](https://github.com/arjunbioinfo/scRNA-seq-reproducible/actions/workflows/ci.yml)
+
 A reproducible, config-driven single-cell RNA-seq pipeline built on
 [Scanpy](https://scanpy.readthedocs.io) / [scverse](https://scverse.org). Point it
 at **any** public dataset — a GEO accession, a local 10x/`.h5`/`.h5ad` file, or a
@@ -26,6 +28,13 @@ python scrna_pipeline.py --config config/config.yaml
 
 Outputs land in `results/` (processed `.h5ad`, `markers.csv`, `cluster_sizes.csv`)
 and `figures/` (QC violins, HVG, PCA variance, UMAPs, marker dotplot).
+
+Prefer an interactive walkthrough? Open **`notebooks/walkthrough.ipynb`** — the
+same steps, cell by cell, with plots inline.
+
+Every push runs the pipeline on the example dataset in CI
+(`.github/workflows/ci.yml`), so the badge above shows whether the workflow is
+reproducible from a clean environment.
 
 ## Use your own data
 
