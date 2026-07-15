@@ -1,0 +1,50 @@
+# =============================================================================
+# scRNA-seq pipeline configuration
+# Edit the `data` block to point at your dataset; everything else is parameters.
+# =============================================================================
+
+data:
+  # source: one of  example | geo | 10x_mtx | h5 | h5ad | url
+  source: example
+
+  # --- used when source == geo ---
+  geo_accession: null        # e.g. GSE123456
+
+  # --- used when source == 10x_mtx | h5 | h5ad ---
+  path: null                 # e.g. data/filtered_feature_bc_matrix  (10x_mtx dir)
+                             #      data/sample.h5   |   data/sample.h5ad
+
+  # --- used when source == url ---
+  url: null                  # direct link to a .h5ad or 10x .h5 file
+
+  var_names: gene_symbols    # or gene_ids (10x_mtx only)
+
+output:
+  dir: results
+  figures_dir: figures
+  work_dir: data
+  processed_h5ad: results/processed.h5ad
+
+qc:
+  mito_prefix: "MT-"         # human = MT- ; mouse = mt-
+  min_genes: 200             # drop cells with < this many genes
+  min_cells: 3               # drop genes seen in < this many cells
+  n_mads: 5                  # MAD-based outlier cutoff (counts / genes / top-20%)
+  pct_counts_mt_max: null    # hard mito cap (e.g. 20); null => MAD-based (3 MADs)
+  doublet_detection: true    # scrublet
+
+preprocess:
+  target_sum: 10000          # normalize_total
+  n_top_genes: 2000          # highly variable genes
+  n_pcs: 50
+  regress_out: []            # e.g. [total_counts, pct_counts_mt]
+  scale_max: 10
+
+cluster:
+  n_neighbors: 15
+  leiden_resolution: 1.0
+  random_state: 0
+
+markers:
+  method: wilcoxon           # wilcoxon | t-test | logreg
+  n_genes: 25
