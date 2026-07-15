@@ -1,0 +1,22 @@
+name: scrna-repro
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.11
+  - numpy=1.26.*
+  - pandas=2.2.*
+  - scipy=1.13.*
+  - scanpy=1.10.*
+  - anndata=0.10.*
+  - leidenalg=0.10.*
+  - python-igraph=0.11.*
+  - scikit-learn=1.4.*
+  - scikit-misc=0.3.*        # highly_variable_genes (seurat_v3)
+  - scrublet=0.2.*           # doublet detection
+  - umap-learn=0.5.*
+  - matplotlib=3.8.*
+  - pyyaml
+  - pip
+  - pip:
+      - GEOparse==2.0.4      # GEO accession download
