@@ -1,0 +1,53 @@
+# =============================================================================
+# Worked example on REAL, PUBLIC data
+# -----------------------------------------------------------------------------
+# Wang et al. 2020, "Single-cell RNA-seq analysis on human endometrium across
+# the natural menstrual cycle" (Nat Med).  GEO: GSE111976.
+#
+# The processed count matrix is distributed as a single gzipped CSV
+# (GSE111976_ct.csv.gz, ~12 MB, genes x cells), which the pipeline loads via the
+# `csv` source below -- no access request needed, unlike controlled-access EGA
+# datasets.
+#
+# Run:
+#     python scrna_pipeline.py --config config/examples/endometrium_GSE111976.yaml
+#
+# NOTE on orientation: GEO count CSVs are usually genes-as-rows. If the matrix
+# loads transposed (implausible cell/gene counts), set genes_are_rows: false.
+# =============================================================================
+
+data:
+  source: csv
+  url: https://ftp.ncbi.nlm.nih.gov/geo/series/GSE111nnn/GSE111976/suppl/GSE111976_ct.csv.gz
+  genes_are_rows: true       # rows = genes, columns = cells (GEO convention)
+  sep: ","
+
+output:
+  dir: results/endometrium_GSE111976
+  figures_dir: figures/endometrium_GSE111976
+  work_dir: data
+  processed_h5ad: results/endometrium_GSE111976/processed.h5ad
+
+qc:
+  mito_prefix: "MT-"         # human
+  min_genes: 200
+  min_cells: 3
+  n_mads: 5
+  pct_counts_mt_max: null
+  doublet_detection: true
+
+preprocess:
+  target_sum: 10000
+  n_top_genes: 2000
+  n_pcs: 50
+  regress_out: []
+  scale_max: 10
+
+cluster:
+  n_neighbors: 15
+  leiden_resolution: 1.0
+  random_state: 0
+
+markers:
+  method: wilcoxon
+  n_genes: 25
