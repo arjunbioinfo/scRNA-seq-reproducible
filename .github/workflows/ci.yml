@@ -1,7 +1,8 @@
 name: CI
 
-# Runs the pipeline end-to-end on the bundled example dataset (3k PBMCs)
-# on every push / PR, proving the environment and workflow are reproducible.
+# Runs the pipeline end-to-end on the bundled example dataset (3k PBMCs) on
+# every push / PR, using BOTH documented install paths (pip and conda), so the
+# badge is proof the workflow reproduces from a clean environment either way.
 
 on:
   push:
@@ -10,7 +11,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-example:
+  # ---- Path 1: pip install from requirements.txt ----
+  run-example-pip:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,7 +23,7 @@ jobs:
           python-version: "3.11"
           cache: pip
 
-      - name: Install pinned dependencies
+      - name: Install pinned dependencies (pip)
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -36,7 +38,42 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: example-outputs
+          name: example-outputs-pip
+          path: |
+            figures/*.png
+            results/*.csv
+          if-no-files-found: warn
+
+  # ---- Path 2: conda env from environment.yml ----
+  run-example-conda:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}   # login shell so `conda activate` works
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create conda environment (environment.yml)
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          environment-file: environment.yml
+          activate-environment: scrna-repro
+          auto-activate-base: false
+          miniforge-version: latest
+          conda-remove-defaults: true
+
+      - name: Run pipeline on example dataset
+        run: |
+          conda info --envs
+          python scrna_pipeline.py --config config/config.yaml
+          echo "----- cluster sizes -----"
+          cat results/cluster_sizes.csv
+
+      - name: Upload outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: example-outputs-conda
           path: |
             figures/*.png
             results/*.csv
