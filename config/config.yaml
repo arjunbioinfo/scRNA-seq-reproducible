@@ -4,7 +4,7 @@
 # =============================================================================
 
 data:
-  # source: one of  example | geo | 10x_mtx | h5 | h5ad | url
+  # source: one of  example | geo | 10x_mtx | h5 | h5ad | url | csv
   source: example
 
   # --- used when source == geo ---
@@ -16,6 +16,12 @@ data:
 
   # --- used when source == url ---
   url: null                  # direct link to a .h5ad or 10x .h5 file
+
+  # --- used when source == csv (dense count matrix, optionally .gz) ---
+  # provide `path` or `url` above; rows=genes by default (flip if needed):
+  genes_are_rows: true       # set false if the CSV is cells x genes
+  sep: ","                   # use "\t" for TSV
+  # see config/examples/endometrium_GSE111976.yaml for a real public example
 
   var_names: gene_symbols    # or gene_ids (10x_mtx only)
 
