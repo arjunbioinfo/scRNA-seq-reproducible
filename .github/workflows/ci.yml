@@ -1,0 +1,39 @@
+name: CI
+
+# Runs the pipeline end-to-end on the bundled example dataset (3k PBMCs)
+# on every push / PR, proving the environment and workflow are reproducible.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  run-example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up environment (micromamba from environment.yml)
+        uses: mamba-org/setup-micromamba@v2
+        with:
+          environment-file: environment.yml
+          cache-environment: true
+
+      - name: Run pipeline on example dataset
+        shell: bash -el {0}
+        run: |
+          python scrna_pipeline.py --config config/config.yaml
+          echo "----- cluster sizes -----"
+          cat results/cluster_sizes.csv
+
+      - name: Upload outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: example-outputs
+          path: |
+            figures/*.png
+            results/*.csv
+          if-no-files-found: warn
