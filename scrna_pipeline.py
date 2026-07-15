@@ -3,7 +3,8 @@
 Reproducible single-cell RNA-seq pipeline (Scanpy / scverse).
 
 One config file drives the whole run: point it at a GEO accession, a local
-10x/h5/h5ad file, or a URL, and it performs QC -> normalization -> HVG -> PCA ->
+10x/h5/h5ad file, a CSV count matrix, or a URL, and it performs
+QC -> normalization -> HVG -> PCA ->
 neighbors -> UMAP -> Leiden clustering -> marker genes, saving a processed
 AnnData, figures, and CSV summaries.
 
@@ -80,6 +81,9 @@ def load_data(cfg: dict, work_dir: Path) -> sc.AnnData:
         local = _download(url, work_dir / fname)
         adata = _read_any(local, var_names)
 
+    elif source == "csv":
+        adata = load_csv(d, work_dir)
+
     elif source == "geo":
         adata = load_geo(d["geo_accession"], work_dir, var_names)
 
@@ -89,6 +93,38 @@ def load_data(cfg: dict, work_dir: Path) -> sc.AnnData:
     adata.var_names_make_unique()
     adata.obs_names_make_unique()
     print(f"[io] loaded AnnData: {adata.n_obs} cells x {adata.n_vars} genes")
+    return adata
+
+
+def load_csv(d: dict, work_dir: Path) -> sc.AnnData:
+    """Load a dense CSV/TSV count matrix (optionally .gz) into AnnData.
+
+    Many GEO series ship counts as a single delimited table. By convention rows
+    are genes and columns are cells (``genes_are_rows: true``); flip it to false
+    if your file is cells x genes. ``path`` reads a local file, ``url`` downloads
+    one first. Compression is inferred from a ``.gz`` suffix.
+    """
+    import scipy.sparse as sp
+
+    src = d.get("path")
+    if d.get("url"):
+        url = d["url"]
+        fname = url.split("?")[0].split("/")[-1] or "matrix.csv.gz"
+        src = str(_download(url, work_dir / fname))
+    if not src:
+        raise ValueError("data.source 'csv' needs a 'path' or 'url'")
+
+    sep = d.get("sep", ",")
+    print(f"[io] reading CSV count matrix {src}")
+    df = pd.read_csv(src, index_col=0, sep=sep)   # .gz auto-detected by pandas
+    if d.get("genes_are_rows", True):
+        df = df.T                                 # -> cells (rows) x genes (cols)
+    adata = sc.AnnData(
+        X=sp.csr_matrix(df.to_numpy(dtype="float32")),
+        obs=pd.DataFrame(index=df.index.astype(str)),
+        var=pd.DataFrame(index=df.columns.astype(str)),
+    )
+    print(f"[io] CSV -> {adata.n_obs} cells x {adata.n_vars} genes")
     return adata
 
 

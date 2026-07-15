@@ -53,13 +53,55 @@ data: { source: h5ad, path: data/sample.h5ad }
 
 # d) a direct URL to a .h5ad or 10x .h5
 data: { source: url,  url: https://example.org/dataset.h5ad }
+
+# e) a dense CSV/TSV count matrix (optionally .gz), local or by URL
+#    genes_are_rows: true (default) => rows are genes, columns are cells
+data: { source: csv, url: https://.../counts.csv.gz, genes_are_rows: true }
 ```
 
 GEO layouts vary; the loader tries `.h5ad` → 10x `.h5` → 10x mtx triplet (and
 un-tars archives). If it can't auto-detect the matrix, download the supplementary
-file manually and use `source: 10x_mtx | h5 | h5ad`.
+file manually and use `source: 10x_mtx | h5 | h5ad`, or `source: csv` if the
+series ships a plain count table.
 
 For **mouse** data, set `qc.mito_prefix: "mt-"`.
+
+## Real public example: human endometrium (GSE111976)
+
+A second worked example runs the whole pipeline on **real, public** single-cell
+data — Wang et al. 2020, *Single-cell RNA-seq of human endometrium across the
+natural menstrual cycle* ([GSE111976](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE111976)).
+GEO distributes the counts as one gzipped CSV (~12 MB), loaded via `source: csv`:
+
+```bash
+python scrna_pipeline.py --config config/examples/endometrium_GSE111976.yaml
+```
+
+No access request is needed — it downloads straight from GEO. Outputs land in
+`results/endometrium_GSE111976/` and `figures/endometrium_GSE111976/`. (If the
+matrix loads transposed, set `genes_are_rows: false` in that config.)
+
+## Starting from raw FASTQ (incl. controlled-access data)
+
+This pipeline starts from a **count matrix**. Many datasets — including
+controlled-access EGA studies (e.g. `EGAD*`) and SRA/ENA runs — are distributed
+as raw **FASTQ**, which must be aligned and counted first:
+
+1. **Obtain the data.** For controlled-access EGA datasets, submit a Data Access
+   request to the study's DAC, sign the Data Access Agreement, then download with
+   [`pyega3`](https://github.com/EGA-archive/pyega3):
+   `pyega3 -cf credentials.json fetch EGAD50000001017`.
+2. **Align + count** to produce a cell × gene matrix. For 10x data use
+   **Cell Ranger** (`cellranger count`) or **STARsolo**; the output
+   `filtered_feature_bc_matrix/` (or `.h5`) is what you feed in next.
+3. **Run this pipeline** on the resulting matrix:
+   `data: { source: 10x_mtx, path: <sample>/outs/filtered_feature_bc_matrix }`
+   (or `source: h5`).
+
+> **Keep controlled-access data private.** Data used under a DAA (e.g. EGA
+> datasets) is personal data — never commit the raw data, matrices, or
+> identifiable outputs to a public repo. Run these in a **private** repository
+> and follow the agreement's terms.
 
 ## Parameters
 
@@ -77,12 +119,14 @@ run is fully described by its config file.
 ## Layout
 
 ```text
-scrna_pipeline.py     the pipeline (load / QC / preprocess / cluster / markers)
-config/config.yaml    dataset selection + all parameters
-environment.yml       pinned conda environment
-requirements.txt      pip alternative
-Makefile              make setup / make run / make clean
-results/  figures/    outputs (git-ignored except .gitkeep)
+scrna_pipeline.py        the pipeline (load / QC / preprocess / cluster / markers)
+config/config.yaml       dataset selection + all parameters
+config/examples/         ready-to-run configs (e.g. endometrium_GSE111976.yaml)
+notebooks/walkthrough.ipynb   interactive, cell-by-cell version
+environment.yml          pinned conda environment
+requirements.txt         pip alternative
+Makefile                 make setup / make run / make clean
+results/  figures/       outputs (git-ignored except .gitkeep)
 ```
 
 ## License
