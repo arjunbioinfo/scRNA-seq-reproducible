@@ -12,11 +12,11 @@ dependencies:
   - leidenalg=0.10.*
   - python-igraph=0.11.*
   - scikit-learn=1.4.*
-  - scikit-misc=0.3.*        # highly_variable_genes (seurat_v3)
   - scrublet=0.2.*           # doublet detection
   - umap-learn=0.5.*
   - matplotlib=3.8.*
   - pyyaml
   - pip
   - pip:
+      - scikit-misc==0.3.1   # highly_variable_genes (seurat_v3); pip wheel (conda-forge lacks 0.3.x)
       - GEOparse==2.0.4      # GEO accession download
