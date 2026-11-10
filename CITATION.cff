@@ -7,6 +7,7 @@ type: software
 authors:
   - family-names: Thippana
     given-names: Mallikarjuna
+    orcid: "https://orcid.org/0000-0001-8485-8626"
 repository-code: "https://github.com/arjunbioinfo/scRNA-seq-reproducible"
 url: "https://arjunbioinfo.github.io/"
 license: MIT
