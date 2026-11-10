@@ -30,6 +30,21 @@ python scrna_pipeline.py --config config/config.yaml
 Outputs land in `results/` (processed `.h5ad`, `markers.csv`, `cluster_sizes.csv`)
 and `figures/` (QC violins, HVG, PCA variance, UMAPs, marker dotplot).
 
+### Example output
+
+On the bundled 3k-PBMC example, the default config keeps **2,382 cells** after
+MAD-based QC and doublet removal and finds **7 Leiden clusters**, which the top
+markers resolve into T cells (*IL7R*, *CD3D*, *LTB*), NK cells (*NKG7*, *GZMA*),
+B cells (*CD79A*, *CD74*), CD14⁺ and FCGR3A⁺ monocytes (*LYZ*, *S100A9*; *LST1*,
+*FCER1G*) and dendritic cells (*FCER1A*).
+
+<p align="center">
+  <img src="docs/example_umap_leiden.png" alt="UMAP coloured by Leiden cluster" width="420">
+</p>
+<p align="center">
+  <img src="docs/example_markers_dotplot.png" alt="Dot plot of the top five marker genes per cluster" width="900">
+</p>
+
 Prefer an interactive walkthrough? Open **`notebooks/walkthrough.ipynb`** — the
 same steps, cell by cell, with plots inline.
 
