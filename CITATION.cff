@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "scRNA-seq-reproducible: a config-driven single-cell RNA-seq pipeline"
+abstract: >-
+  A reproducible, deterministic Scanpy/scverse pipeline that runs QC, normalisation, clustering and marker-gene detection on any public single-cell RNA-seq dataset.
+type: software
+authors:
+  - family-names: Thippana
+    given-names: Mallikarjuna
+repository-code: "https://github.com/arjunbioinfo/scRNA-seq-reproducible"
+url: "https://arjunbioinfo.github.io/"
+license: MIT
+keywords:
+  - bioinformatics
+  - single-cell
+  - scrna-seq
+  - scanpy
+  - scverse
+  - reproducibility
