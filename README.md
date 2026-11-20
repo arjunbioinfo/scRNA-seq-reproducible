@@ -105,7 +105,7 @@ as raw **FASTQ**, which must be aligned and counted first:
 
 1. **Obtain the data.** For controlled-access EGA datasets, submit a Data Access
    request to the study's DAC, sign the Data Access Agreement, then download with
-   [`pyega3`](https://github.com/EGA-archive/pyega3):
+   [`pyega3`](https://github.com/EGA-archive/ega-download-client):
    `pyega3 -cf credentials.json fetch EGAD50000001017`.
 2. **Align + count** to produce a cell × gene matrix. For 10x data use
    **Cell Ranger** (`cellranger count`) or **STARsolo**; the output
