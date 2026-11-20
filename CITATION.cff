@@ -9,6 +9,7 @@ authors:
     given-names: Mallikarjuna
     orcid: "https://orcid.org/0000-0001-8485-8626"
 repository-code: "https://github.com/arjunbioinfo/scRNA-seq-reproducible"
+doi: "10.5281/zenodo.24392077"
 url: "https://arjunbioinfo.github.io/"
 license: MIT
 keywords:
